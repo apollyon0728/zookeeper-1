@@ -7,9 +7,6 @@
  */
 package yangqi.code;
 
-import java.util.Arrays;
-import java.util.Date;
-
 import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.Code;
@@ -18,19 +15,22 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
+import java.util.Arrays;
+import java.util.Date;
+
 public class DataMonitor implements Watcher, StatCallback {
 
-    ZooKeeper           zk;
+    ZooKeeper zk;
 
-    String              znode;
+    String znode;
 
-    Watcher             chainedWatcher;
+    Watcher chainedWatcher;
 
-    boolean             dead;
+    boolean dead;
 
     DataMonitorListener listener;
 
-    byte                prevData[];
+    byte prevData[];
 
     public DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher, DataMonitorListener listener) {
         this.zk = zk;
@@ -41,7 +41,6 @@ public class DataMonitor implements Watcher, StatCallback {
         // to be completely event driven
         zk.exists(znode, true, this, null);
     }
-
 
 
     public void process(WatchedEvent event) {
@@ -91,7 +90,7 @@ public class DataMonitor implements Watcher, StatCallback {
     public void processResult(int rc, String path, Object ctx, Stat stat) {
         boolean exists;
 
-        System.out.println("STAT CALL BACK");
+        System.out.println(">>>> STAT CALL BACK <<<<");
         System.out.println("rc " + rc);
         System.out.println("path " + path);
         System.out.println("ctx " + ctx);
@@ -101,7 +100,7 @@ public class DataMonitor implements Watcher, StatCallback {
                 exists = true;
                 break;
             case Code.NoNode:
-                // É¾³ý½áµãµÄÊ±ºò
+                // É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
                 exists = false;
                 break;
             case Code.SessionExpired:

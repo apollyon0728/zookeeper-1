@@ -22,20 +22,20 @@ public class ZkNIOClient {
     public static void main(String[] args) {
         ZkNIOClient client = new ZkNIOClient();
 
-        int port=2181;
+        int port = 2181;
 
-        String host="127.0.0.1";
+        String host = "127.0.0.1";
 
-        System.out.println("start to connect to "+host+" :" + port);
+        System.out.println("start to connect to " + host + " :" + port);
 
-        InetSocketAddress address=new InetSocketAddress(host,port);
+        InetSocketAddress address = new InetSocketAddress(host, port);
 
         boolean connected = client.connect(address);
 
-        System.out.println("start to connect to "+host+" :" + port+",status "+connected);
+        System.out.println("start to connect to " + host + " :" + port + ",status " + connected);
 
-        int i=0;
-        while(i++<3){
+        int i = 0;
+        while (i++ < 3) {
             client.listen();
         }
     }
@@ -57,11 +57,8 @@ public class ZkNIOClient {
     }
 
     private SocketChannel createSocket() {
-        try {
+        try (SocketChannel socketChannel = SocketChannel.open()) {
             selector = Selector.open();
-
-            SocketChannel socketChannel = SocketChannel.open();
-
             socketChannel.socket().setTcpNoDelay(false);
             socketChannel.socket().setSoLinger(false, -1);
             socketChannel.configureBlocking(false);
@@ -74,33 +71,33 @@ public class ZkNIOClient {
         return null;
     }
 
-    private void listen(){
+    private void listen() {
         try {
-            int keys= selector.select();
+            int keys = selector.select();
 
-            for (SelectionKey key:selector.selectedKeys()){
-                System.out.println("Selection key is "+key);
+            for (SelectionKey key : selector.selectedKeys()) {
+                System.out.println("Selection key is " + key);
 
-                if(key.isConnectable()){
+                if (key.isConnectable()) {
                     System.out.println("Connecting ");
 
                     SocketChannel channel = (SocketChannel) key.channel();
 
-                    if(channel.isConnectionPending()){
+                    if (channel.isConnectionPending()) {
                         channel.finishConnect();
                     }
 
                     channel.write(ByteBuffer.wrap(new String("stat").getBytes()));
 
-                    channel.register(selector,SelectionKey.OP_READ);
-                }else if(key.isReadable()){
+                    channel.register(selector, SelectionKey.OP_READ);
+                } else if (key.isReadable()) {
                     System.out.println("Reading data ");
 
-                    SocketChannel channel=(SocketChannel)key.channel();
-                    ByteBuffer buffer=ByteBuffer.allocate(1024);
+                    SocketChannel channel = (SocketChannel) key.channel();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
                     channel.read(buffer);
 
-                    System.out.println("read zk server stat "+new String(buffer.array()));
+                    System.out.println("read zk server stat " + new String(buffer.array()));
 
                 }
             }

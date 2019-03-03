@@ -16,39 +16,41 @@ import org.apache.zookeeper.ZooKeeper;
 
 /**
  * 类Executor.java的实现描述：TODO 类实现描述
- * 
+ *
  * @author yangqi 2013-5-30 下午10:48:09
+ *
+ * 可参考 https://www.cnblogs.com/haippy/archive/2012/07/20/2600077.html
  */
 
 public class Executor implements Watcher, Runnable, DataMonitorListener {
 
-    String      znode;
+    String zNode;
 
     DataMonitor dm;
 
-    ZooKeeper   zk;
+    ZooKeeper zk;
 
-    String      exec[];
+    String exec[];
 
-    Process     child;
+    Process child;
 
-    public Executor(String hostPort, String znode, String exec[]) throws KeeperException, IOException {
+    public Executor(String hostPort, String zNode, String exec[]) throws KeeperException, IOException {
         this.exec = exec;
         zk = new ZooKeeper(hostPort, 3000, this);
-        dm = new DataMonitor(zk, znode, null, this);
+        dm = new DataMonitor(zk, zNode, null, this);
     }
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-        args = new String[] { "localhost:2181", "/yangqi_test" };
+        args = new String[]{"localhost:2181", "/yangqi_test"};
 
         String hostPort = args[0];
-        String znode = args[1];
-        String exec[] = new String[] { "date" };
+        String zNode = args[1];
+        String exec[] = new String[]{"date"};
         try {
-            new Executor(hostPort, znode, exec).run();
+            new Executor(hostPort, zNode, exec).run();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,7 +58,7 @@ public class Executor implements Watcher, Runnable, DataMonitorListener {
 
     /***************************************************************************
      * We do process any events ourselves, we just need to forward them on.
-     * 
+     *
      * @see org.apache.zookeeper.Watcher#process(org.apache.zookeeper.proto.WatcherEvent)
      */
     public void process(WatchedEvent event) {
@@ -88,7 +90,7 @@ public class Executor implements Watcher, Runnable, DataMonitorListener {
 
         OutputStream os;
 
-        InputStream  is;
+        InputStream is;
 
         StreamWriter(InputStream is, OutputStream os) {
             this.is = is;

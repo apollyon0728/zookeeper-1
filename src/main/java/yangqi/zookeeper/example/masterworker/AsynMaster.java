@@ -22,20 +22,21 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
 /**
- * 类Master.java的实现描述：TODO 类实现描述 
+ * 类Master.java的实现描述：TODO 类实现描述
+ *
  * @author yangqi Jan 1, 2014 1:37:01 PM
  */
 public class AsynMaster implements Watcher, Runnable {
 
     private ZooKeeper zk;
 
-    private String    connectString;
+    private String connectString;
 
-    private String    serverId;
+    private String serverId;
 
     private static final String MASTER_PATH = "/master";
 
-    public AsynMaster(String connectString,String serverId) {
+    public AsynMaster(String connectString, String serverId) {
         this.connectString = connectString;
         this.serverId = serverId;
     }
@@ -61,34 +62,33 @@ public class AsynMaster implements Watcher, Runnable {
         }
     }
 
-    public void createMaterNode(){
+    public void createMaterNode() {
         String ctx = "ctx for " + serverId;
-        zk.create(MASTER_PATH, serverId.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL,
-                      new StringCallback() {
-                          @Override
-                          public void processResult(int rc, String path, Object ctx, String name) {
-                          Code code = Code.get(rc);
-                          switch (code) {
-                              case OK:
-                                  log("create master ok");
-                                  sleep(10);
-                                  stopZK();
-                                  break;
-                              case NODEEXISTS:
-                                  log("node exists");
-                                  checkForMaster();
-                                  break;
-                              case SESSIONEXPIRED:
-                                  log("session expired in create");
-                                  sleep(10);
-                                  break;
-                              default:
-                                  checkForMaster();
-                                  log("code is " + code);
-                          }
+        zk.create(MASTER_PATH, serverId.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL, new StringCallback() {
+            @Override
+            public void processResult(int rc, String path, Object ctx, String name) {
+                Code code = Code.get(rc);
+                switch (code) {
+                    case OK:
+                        log("create master ok");
+                        sleep(10);
+                        stopZK();
+                        break;
+                    case NODEEXISTS:
+                        log("node exists");
+                        checkForMaster();
+                        break;
+                    case SESSIONEXPIRED:
+                        log("session expired in create");
+                        sleep(10);
+                        break;
+                    default:
+                        checkForMaster();
+                        log("code is " + code);
+                }
 
-                          }
-                  }, ctx);
+            }
+        }, ctx);
     }
 
     public void checkForMaster() {
